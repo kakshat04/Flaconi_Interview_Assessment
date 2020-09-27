@@ -1,7 +1,0 @@
-.idea/
-.pytest_cache/
-*.pyc
-*.log
-
-
-path passed as parameter

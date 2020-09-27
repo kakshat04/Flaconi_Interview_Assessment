@@ -1,9 +1,0 @@
-- Please create a public repo on Git
-
-- Create automation tests for the following scenarios:
-
-1. add to cart a random product from Parfum category
-2. on the Cart page to verify if we are displaying the correct price
-3. verify the main navigation menu links
-
-URL: https://www.flaconi.de/
