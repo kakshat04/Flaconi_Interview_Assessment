@@ -8,7 +8,7 @@ def custom_logger(debug_level=logging.DEBUG):
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
 
-    file_handler = logging.FileHandler("automation.log", mode='a')
+    file_handler = logging.FileHandler("Automation_Test_Log.log", mode='a')
     file_handler.setLevel(debug_level)
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s: %(message)s',

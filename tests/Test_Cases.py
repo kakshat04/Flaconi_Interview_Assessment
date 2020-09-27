@@ -1,45 +1,70 @@
-from Project.pages.login_pages import LoginPage
-from Project.pages.data_modification import DataModification
-from Project.pages.data_modification_check import DataModificationCheck
-from Project.pages.report_test import ReportTest
+from pages.PerfumeSelection import PerfumeSelection
+from pages.PerfumeDetailBeforeFinalSelection import SelectPerfumeToAddToCart
+from pages.GetDetailsBeforeAddingToCart import DetailBeforeAdditionToCart
+from pages.PerfumeDetailFromCart import PerfumeDetailsFromCart
 import unittest
 import time
 import pytest
+global MainPageTitle
 
 
 @pytest.mark.usefixtures("oneTimeSetUp")
-class LoginTest(unittest.TestCase):
+class Test(unittest.TestCase):
 
     @pytest.fixture(autouse=True)
     def classSetup(self):
-        self.lp = LoginPage(self.driver)
-        self.dm = DataModification(self.driver)
-        self.dmc = DataModificationCheck(self.driver)
-        self.rt = ReportTest(self.driver)
+        self.ps = PerfumeSelection(self.driver)
+        self.bfs = SelectPerfumeToAddToCart(self.driver)
+        self.batc = DetailBeforeAdditionToCart(self.driver)
+        self.aatc = PerfumeDetailsFromCart(self.driver)
 
-    # @pytest.mark.run(order=1)
-    # def test_invalid_login(self):
-    #     self.lp.login_page(email="invalidemail@gmail.com", password="invalid_password")
-    #     time.sleep(2)
-    #     assert self.lp.verify_login_failed() is True  # Verify login not successful
+    @pytest.mark.run(order=1)
+    def test_perfume_selection(self):
+        global MainPageTitle
+        self.ps.accept_cookies()
+        time.sleep(2)
+        MainPageTitle = self.ps.get_page_title()
+
+        assert self.ps.navigate_to_product("perfume") is True
+        assert self.ps.select_perfume("Tom Ford") is True
 
     @pytest.mark.run(order=2)
-    def test_valid_login(self):
-        self.lp.login_page(email="kumar.akshat04@gmail.com", password="Knight@riders1")
-        time.sleep(1)
-        assert self.lp.verify_login_successful() is True  # Verify login successful
+    def test_verify_name_and_cost_of_selected_perfume(self):
+        selected_perfume_details = self.bfs.get_selected_perfume_details()
+        self.bfs.proceed_with_selection()
+
+        get_details_before_adding_to_cart = self.batc.get_detail_before_adding_cart()
+        self.batc.proceed_with_selection()
+
+        get_perfume_detail_from_cart = self.aatc.get_perfume_detail_from_cart()
+        # get_perfume_detail_from_cart = ['Tom Ford', '50', 'ml', '70,95 €*']
+
+        assert selected_perfume_details == get_details_before_adding_to_cart, f'Mismatch in Selected Perfume Details' \
+                                                                              f' and Before adding to Cart page :: ' \
+                                                                              f'{selected_perfume_details},' \
+                                                                              f'{get_details_before_adding_to_cart}'
+        assert get_details_before_adding_to_cart == get_perfume_detail_from_cart, f'Mismatch in Details Before and ' \
+                                                                                  f'After adding to Cart :: ' \
+                                                                                  f'{get_details_before_adding_to_cart}'\
+                                                                                  f'{get_perfume_detail_from_cart}'
+        assert selected_perfume_details == get_perfume_detail_from_cart, f'Mismatch in Selected Perfume Details and ' \
+                                                                         f'After adding to Cart :: ' \
+                                                                         f'{selected_perfume_details}'\
+                                                                         f'{get_perfume_detail_from_cart}'
+
+        print(selected_perfume_details)
+        print(get_details_before_adding_to_cart)
+        print(get_perfume_detail_from_cart)
 
     @pytest.mark.run(order=3)
-    def test_check_report(self):
-        self.rt.goto_iam_users()
-        assert self.rt.verify_result_report() is True
+    def test_mainmenu_navigation_link(self):
+        global MainPageTitle
+        self.aatc.navigate_to_main_page()
+        main_pagetitle_after = self.aatc.get_page_title()
+        print(MainPageTitle)
+        print(main_pagetitle_after)
+        assert MainPageTitle == main_pagetitle_after, f'Page title before is {MainPageTitle} and' \
+                                                      f' page title after is {main_pagetitle_after}'
 
-    # @pytest.mark.run(order=4)
-    # def test_data_modification(self):
-    #     assert self.dm.navigate_integration_api() is True
-    #     assert self.dm.data_modify_security_warn_level() is True
-    #
-    # @pytest.mark.run(order=5)
-    # def test_modification_check(self):
-    #     assert self.dmc.validate_leanix_scan_agent_user() is True
-    #     assert self.dmc.validate_leanix_access_ldif_bucket() is True
+
+
